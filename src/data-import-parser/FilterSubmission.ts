@@ -3,7 +3,7 @@ import { Transform, TransformOptions, TransformCallback } from 'stream';
 class FilterSubmissionStream extends Transform {
     currentSubmission: any;
     header: any;
-    repeatableSectionFields: Array<string>;
+    repeatableSectionFields: string[];
     constructor(options: TransformOptions = {}) {
         options.objectMode = true;
         super({ ...options });
@@ -20,7 +20,7 @@ class FilterSubmissionStream extends Transform {
         if (!this.header) {
             this.header = data;
         } else {
-            const isNewSubmission = !!data['submission_number'];
+            const isNewSubmission = !!data?.submission_number;
             if (isNewSubmission) {
                 if (this.currentSubmission) {
                     this.push(this.currentSubmission);
@@ -28,7 +28,7 @@ class FilterSubmissionStream extends Transform {
                 this.currentSubmission = data;
             } else {
                 const keys = Object.keys(data);
-                for (let key of keys) {
+                for (const key of keys) {
                     if (!this.repeatableSectionFields.includes(key)) continue;
                     const currentResponse = this.currentSubmission[key];
                     const updatedResponse = Array.isArray(currentResponse) ? [...currentResponse] : [currentResponse];
